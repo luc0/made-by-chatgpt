@@ -7,6 +7,6 @@ Además hace que el texto este por delante del video, y el video que tenga que v
 
 iteración 2.0:
 "programa solo en javascript vainilla, sin html,
-un programa que muestre de fondo un video al azar que llene toda la pantalla y entre justo centrado, utilizando una etiqueta video.
-además una frase legible inteligente en el medio, grande y por encima del video, con el autor quien la dijo, que sea estéticamente agradable y este por delante del video, y que se obtenga del sitio: type.fit/api/quotes
-El video tiene que ser distinto en cada frase y relacionado con la palabra mas larga de la frase (sin incluir signos), si no encuentra nada en 2 segundos probar con otra palabra. Además agregale un spinner visible de carga al video mientras esta cargando. El video se debe obtener del sitio pexels.com. para la API usar la siguiente key: "ddjm8OIXvFDtgsNCCPWeH38zaZdgMymJGqe9rjrXfYfGKrKboUSiok62"."
+un programa que muestre de fondo un video al azar que llene toda la pantalla, entre justo centrado, y se reproduzca automaticamente.
+además una frase legible inteligente en el medio, esteticamente bella, grande y por encima del video, con el autor quien la dijo, que sea estéticamente agradable y este por delante del video, y que se obtenga del sitio: type.fit/api/quotes
+El video tiene que ser distinto en cada frase y relacionado con la palabra mas larga de la frase (sin incluir signos), si la API no devuelve videos entonces probar buscar otro video con otra palabra. Además agregale un spinner visible de carga al video mientras esta cargando. El video se debe obtener del sitio pexels.com. para la API usar la siguiente key: "ddjm8OIXvFDtgsNCCPWeH38zaZdgMymJGqe9rjrXfYfGKrKboUSiok62"."
