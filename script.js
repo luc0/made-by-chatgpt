@@ -1,59 +1,71 @@
-// Array con las frases y autores
+// Array de frases inteligentes con autor
 var frases = [
-  { texto: "La creatividad es la inteligencia divirtiéndose", autor: "Albert Einstein" },
-  { texto: "No hay viento favorable para quien no sabe a dónde va", autor: "Séneca" },
-  { texto: "El éxito es la suma de pequeños esfuerzos repetidos día tras día", autor: "Robert Collier" },
-  { texto: "El que quiere hacer algo encuentra un medio, el que no quiere hacer nada encuentra una excusa", autor: "Proverbio Árabe" },
-  { texto: "El miedo es una ilusión", autor: "Michael Jordan" },
-  { texto: "Nunca permitas que la educación te impida aprender algo", autor: "Mark Twain" }
+  {
+    texto: "La vida es como montar en bicicleta. Para mantener el equilibrio, debes seguir avanzando.",
+    autor: "Albert Einstein"
+  },
+  {
+    texto: "La libertad no es la ausencia de compromisos, sino la capacidad de elegir.",
+    autor: "Paulo Coelho"
+  },
+  {
+    texto: "La felicidad no es algo hecho. Viene de tus propias acciones.",
+    autor: "Dalai Lama"
+  },
+  {
+    texto: "No hay viento favorable para el que no sabe a dónde va.",
+    autor: "Séneca"
+  }
 ];
 
-// Array con los gifs y videos
-var multimedia = [
-  { tipo: "gif", url: "https://media.giphy.com/media/l46Ct9mZ1cpolylp6/giphy.gif" },
-  { tipo: "video", url: "https://www.w3schools.com/html/mov_bbb.mp4" },
-  { tipo: "gif", url: "https://media.giphy.com/media/VeE6XlUAVxNiU/giphy.gif" },
-  { tipo: "video", url: "https://www.w3schools.com/html/movie.mp4" }
-];
+// Función que elige al azar un gif o video para establecer como fondo
+function establecerFondo() {
+  // Generar número aleatorio entre 1 y 2 para seleccionar al azar gif o video
+  var aleatorio = Math.floor(Math.random() * 2) + 1;
 
-// Función que elige un elemento aleatorio de un array
-function aleatorio(array) {
-  var indice = Math.floor(Math.random() * array.length);
-  return array[indice];
+  // Si se selecciona el gif, establecer como fondo
+  if (aleatorio === 1) {
+    document.body.style.backgroundImage = "url('ruta/al/gif')";
+  }
+  // Si se selecciona el video, establecer como fondo
+  else {
+    var video = document.createElement("video");
+    video.setAttribute("autoplay", "");
+    video.setAttribute("loop", "");
+    video.setAttribute("muted", "");
+    video.style.position = "fixed";
+    video.style.top = "0";
+    video.style.left = "0";
+    video.style.width = "100%";
+    video.style.height = "100%";
+    var source = document.createElement("source");
+    source.setAttribute("src", "ruta/al/video");
+    video.appendChild(source);
+    document.body.appendChild(video);
+  }
 }
 
-// Función que cambia el fondo a un gif o video aleatorio, y muestra una frase en el centro
-function cambiarFondo() {
-  // Elegir un elemento aleatorio del array de multimedia
-  var elementoMultimedia = aleatorio(multimedia);
+// Función que muestra una frase inteligente en el centro de la pantalla
+function mostrarFrase() {
+  // Generar número aleatorio para seleccionar una frase al azar
+  var indice = Math.floor(Math.random() * frases.length);
+  var frase = frases[indice];
 
-  // Crear un elemento HTML para el gif o video y agregarlo al cuerpo de la página
-  if (elementoMultimedia.tipo === "gif") {
-    var multimediaHTML = document.createElement("img");
-    multimediaHTML.src = elementoMultimedia.url;
-  } else if (elementoMultimedia.tipo === "video") {
-    var multimediaHTML = document.createElement("video");
-    multimediaHTML.src = elementoMultimedia.url;
-    multimediaHTML.autoplay = true;
-    multimediaHTML.loop = true;
-    multimediaHTML.muted = true;
-  }
+  // Crear elemento div para mostrar frase
+  var div = document.createElement("div");
+  div.style.position = "fixed";
+  div.style.top = "50%";
+  div.style.left = "50%";
+  div.style.transform = "translate(-50%, -50%)";
+  div.style.textAlign = "center";
+  div.style.color = "#fff";
+  div.style.fontFamily = "Arial, sans-serif";
+  div.style.fontSize = "2.5em";
+  div.innerHTML = '"' + frase.texto + '"<br>- ' + frase.autor;
 
-  multimediaHTML.style.position = "absolute";
-  multimediaHTML.style.width = "100%";
-  multimediaHTML.style.height = "100%";
-  multimediaHTML.style.top = "0";
-  multimediaHTML.style.left = "0";
-  document.body.appendChild(multimediaHTML);
+  document.body.appendChild(div);
+}
 
-  // Elegir una frase aleatoria del array de frases
-  var frase = aleatorio(frases);
-
-  // Crear un elemento HTML para la frase y agregarlo al cuerpo de la página
-  var fraseHTML = document.createElement("div");
-  fraseHTML.innerHTML = "<p>" + frase.texto + "</p><p><em>" + frase.autor + "</em></p>";
-  fraseHTML.style.position = "absolute";
-  fraseHTML.style.top = "50%";
-  fraseHTML.style.left = "50%";
-  fraseHTML.style.transform = "translate(-50%, -50%)";
-  fraseHTML.style.textAlign = "center
+// Llamamos a las funciones para establecer el fondo y mostrar la frase al cargar la página
+establecerFondo();
+mostrarFrase();
