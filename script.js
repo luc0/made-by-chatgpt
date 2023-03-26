@@ -1,83 +1,71 @@
-const QUOTES_API_URL = 'https://type.fit/api/quotes';
-const PEXELS_API_KEY = 'ddjm8OIXvFDtgsNCCPWeH38zaZdgMymJGqe9rjrXfYfGKrKboUSiok62';
-const VIDEO_WRAPPER_CLASS = 'video-wrapper';
-const QUOTE_WRAPPER_CLASS = 'quote-wrapper';
-const SPINNER_CLASS = 'spinner';
+// Creamos el elemento de video
+const video = document.createElement('video');
 
-let videoPlayer;
-let quoteData;
+// Establecemos las propiedades necesarias para que el video llene la pantalla y se centre
+video.style.position = 'fixed';
+video.style.top = '0';
+video.style.left = '0';
+video.style.width = '100%';
+video.style.height = '100%';
+video.style.objectFit = 'cover';
+video.style.zIndex = '-1';
 
-async function fetchQuotes() {
-  const response = await fetch(QUOTES_API_URL);
-  const data = await response.json();
-  quoteData = data[Math.floor(Math.random() * data.length)];
-  renderQuote();
-  renderVideo();
-}
+// Creamos el elemento de texto
+const text = document.createElement('div');
+text.style.position = 'fixed';
+text.style.top = '50%';
+text.style.left = '50%';
+text.style.transform = 'translate(-50%, -50%)';
+text.style.color = 'white';
+text.style.fontSize = '3em';
+text.style.textAlign = 'center';
+text.style.textShadow = '2px 2px #000';
+text.style.zIndex = '1';
 
-async function fetchVideo(word) {
-  const url = `https://api.pexels.com/videos/search?query=${word}&per_page=10`;
-  const response = await fetch(url, {
-    headers: {
-      'Authorization': PEXELS_API_KEY
-    }
-  });
-  const data = await response.json();
-  if (data.videos.length > 0) {
-    const video = data.videos[Math.floor(Math.random() * data.videos.length)];
-    videoPlayer.src = video.video_files[0].link;
-  } else {
-    renderVideo();
-  }
-}
+// Añadimos los elementos al body
+document.body.appendChild(video);
+document.body.appendChild(text);
 
-function renderQuote() {
-  const quoteWrapper = document.createElement('div');
-  quoteWrapper.classList.add(QUOTE_WRAPPER_CLASS);
+// Hacemos la petición a la API de quotes
+fetch('https://type.fit/api/quotes')
+  .then(response => response.json())
+  .then(data => {
+    // Obtenemos una cita aleatoria
+    const quote = data[Math.floor(Math.random() * data.length)];
 
-  const quote = document.createElement('h1');
-  quote.innerText = quoteData.text;
-  quoteWrapper.appendChild(quote);
+    // Obtenemos la palabra más larga de la cita (sin signos)
+    const longestWord = quote.text
+      .replace(/[^\w\s]|_/g, '')
+      .split(' ')
+      .reduce((longest, current) => current.length > longest.length ? current : longest, '');
 
-  const author = document.createElement('h2');
-  author.innerText = quoteData.author;
-  quoteWrapper.appendChild(author);
+    // Hacemos la petición a la API de videos de Pexels
+    fetch(`https://api.pexels.com/videos/search?query=${longestWord}&per_page=1&page=1`, {
+      headers: {
+        Authorization: 'ddjm8OIXvFDtgsNCCPWeH38zaZdgMymJGqe9rjrXfYfGKrKboUSiok62'
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Obtenemos un video aleatorio
+        const videoUrl = data.videos[Math.floor(Math.random() * data.videos.length)].video_files[0].link;
 
-  document.body.appendChild(quoteWrapper);
-}
+        // Establecemos la fuente del video
+        video.src = videoUrl;
 
-function renderVideo() {
-  const videoWrapper = document.createElement('div');
-  videoWrapper.classList.add(VIDEO_WRAPPER_CLASS);
+        // Añadimos el evento de carga del video para mostrar el spinner
+        video.addEventListener('loadstart', () => {
+          text.innerText = 'Loading...';
+        });
 
-  const spinner = document.createElement('div');
-  spinner.classList.add(SPINNER_CLASS);
-  videoWrapper.appendChild(spinner);
+        // Añadimos el evento de carga completa del video para mostrar la cita
+        video.addEventListener('canplay', () => {
+          text.innerText = `"${quote.text}" - ${quote.author}`;
+        });
 
-  const video = document.createElement('video');
-  video.autoplay = true;
-  video.loop = true;
-  video.muted = true;
-  videoPlayer = video;
-  videoWrapper.appendChild(video);
-
-  document.body.appendChild(videoWrapper);
-
-  const word = getLongestWord(quoteData.text);
-  fetchVideo(word);
-}
-
-function getLongestWord(text) {
-  const words = text.replace(/[^\w\s]/gi, '').split(' ');
-  const longestWord = words.reduce((a, b) => a.length >= b.length ? a : b, '');
-  return longestWord;
-}
-
-fetchQuotes();
-
-setTimeout(() => {
-  if (!videoPlayer.src) {
-    const word = getLongestWord(quoteData.text);
-    fetchVideo(word);
-  }
-}, 2000);
+        // Iniciamos la carga del video
+        video.load();
+      })
+      .catch(error => console.log(error));
+  })
+  .catch(error => console.log(error));
