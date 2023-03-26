@@ -1,71 +1,35 @@
-// Array de frases inteligentes con autor
-var frases = [
-  {
-    texto: "La vida es como montar en bicicleta. Para mantener el equilibrio, debes seguir avanzando.",
-    autor: "Albert Einstein"
-  },
-  {
-    texto: "La libertad no es la ausencia de compromisos, sino la capacidad de elegir.",
-    autor: "Paulo Coelho"
-  },
-  {
-    texto: "La felicidad no es algo hecho. Viene de tus propias acciones.",
-    autor: "Dalai Lama"
-  },
-  {
-    texto: "No hay viento favorable para el que no sabe a dónde va.",
-    autor: "Séneca"
-  }
+const apiKey = '563492ad6f91700001000001018c8faaa9f4489f9cc36f386e11c2d1';
+const gifContainer = document.body;
+const phraseContainer = document.createElement('div');
+phraseContainer.classList.add('phrase-container');
+document.body.appendChild(phraseContainer);
+
+// Obtener una frase aleatoria
+const phrases = [
+  { text: 'La simplicidad es la clave de la verdadera elegancia', author: 'Coco Chanel' },
+  { text: 'La lógica te llevará de A a B. La imaginación te llevará a cualquier parte', author: 'Albert Einstein' },
+  { text: 'La felicidad no es algo hecho. Viene de tus propias acciones', author: 'Dalai Lama' },
+  { text: 'Sé el cambio que deseas ver en el mundo', author: 'Mahatma Gandhi' },
+  { text: 'Si no te gusta algo, cámbialo. Si no puedes cambiarlo, cambia tu actitud', author: 'Maya Angelou' }
 ];
 
-// Función que elige al azar un gif o video para establecer como fondo
-function establecerFondo() {
-  // Generar número aleatorio entre 1 y 2 para seleccionar al azar gif o video
-  var aleatorio = Math.floor(Math.random() * 2) + 1;
+const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+const phraseText = document.createElement('p');
+phraseText.innerHTML = randomPhrase.text;
+phraseContainer.appendChild(phraseText);
 
-  // Si se selecciona el gif, establecer como fondo
-  if (aleatorio === 1) {
-    document.body.style.backgroundImage = "url('ruta/al/gif')";
-  }
-  // Si se selecciona el video, establecer como fondo
-  else {
-    var video = document.createElement("video");
-    video.setAttribute("autoplay", "");
-    video.setAttribute("loop", "");
-    video.setAttribute("muted", "");
-    video.style.position = "fixed";
-    video.style.top = "0";
-    video.style.left = "0";
-    video.style.width = "100%";
-    video.style.height = "100%";
-    var source = document.createElement("source");
-    source.setAttribute("src", "ruta/al/video");
-    video.appendChild(source);
-    document.body.appendChild(video);
-  }
-}
+const phraseAuthor = document.createElement('p');
+phraseAuthor.innerHTML = `-${randomPhrase.author}`;
+phraseContainer.appendChild(phraseAuthor);
 
-// Función que muestra una frase inteligente en el centro de la pantalla
-function mostrarFrase() {
-  // Generar número aleatorio para seleccionar una frase al azar
-  var indice = Math.floor(Math.random() * frases.length);
-  var frase = frases[indice];
-
-  // Crear elemento div para mostrar frase
-  var div = document.createElement("div");
-  div.style.position = "fixed";
-  div.style.top = "50%";
-  div.style.left = "50%";
-  div.style.transform = "translate(-50%, -50%)";
-  div.style.textAlign = "center";
-  div.style.color = "#fff";
-  div.style.fontFamily = "Arial, sans-serif";
-  div.style.fontSize = "2.5em";
-  div.innerHTML = '"' + frase.texto + '"<br>- ' + frase.autor;
-
-  document.body.appendChild(div);
-}
-
-// Llamamos a las funciones para establecer el fondo y mostrar la frase al cargar la página
-establecerFondo();
-mostrarFrase();
+// Obtener un gif aleatorio de Pexels
+const url = 'https://api.pexels.com/videos/search?query=abstract&per_page=80';
+fetch(url, { headers: { Authorization: apiKey } })
+  .then(response => response.json())
+  .then(data => {
+    const randomGif = data.videos[Math.floor(Math.random() * data.videos.length)];
+    gifContainer.style.backgroundImage = `url(${randomGif.image})`;
+    gifContainer.style.backgroundSize = 'cover';
+    gifContainer.style.backgroundPosition = 'center';
+  })
+  .catch(error => console.log(error));
