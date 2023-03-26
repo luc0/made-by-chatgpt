@@ -12,7 +12,7 @@ fetch("https://type.fit/api/quotes")
     // Obtener un video relacionado con la palabra más larga
     const videoUrl = `https://api.pexels.com/videos/search?query=${longestWord}&per_page=1`;
     const headers = new Headers({
-      "Authorization": "Bearer ddjm8OIXvFDtgsNCCPWeH38zaZdgMymJGqe9rjrXfYfGKrKboUSiok62"
+      "Authorization": "ddjm8OIXvFDtgsNCCPWeH38zaZdgMymJGqe9rjrXfYfGKrKboUSiok62"
     });
     fetch(videoUrl, { headers })
       .then(response => response.json())
