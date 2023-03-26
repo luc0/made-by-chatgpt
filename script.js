@@ -1,71 +1,70 @@
-// Creamos el elemento de video
-const video = document.createElement('video');
 
-// Establecemos las propiedades necesarias para que el video llene la pantalla y se centre
-video.style.position = 'fixed';
-video.style.top = '0';
-video.style.left = '0';
-video.style.width = '100%';
-video.style.height = '100%';
-video.style.objectFit = 'cover';
-video.style.zIndex = '-1';
-
-// Creamos el elemento de texto
-const text = document.createElement('div');
-text.style.position = 'fixed';
-text.style.top = '50%';
-text.style.left = '50%';
-text.style.transform = 'translate(-50%, -50%)';
-text.style.color = 'white';
-text.style.fontSize = '3em';
-text.style.textAlign = 'center';
-text.style.textShadow = '2px 2px #000';
-text.style.zIndex = '1';
-
-// Añadimos los elementos al body
-document.body.appendChild(video);
-document.body.appendChild(text);
-
-// Hacemos la petición a la API de quotes
-fetch('https://type.fit/api/quotes')
+// Obtener la cita aleatoria
+fetch("https://type.fit/api/quotes")
   .then(response => response.json())
   .then(data => {
-    // Obtenemos una cita aleatoria
-    const quote = data[Math.floor(Math.random() * data.length)];
-
-    // Obtenemos la palabra más larga de la cita (sin signos)
-    const longestWord = quote.text
-      .replace(/[^\w\s]|_/g, '')
-      .split(' ')
-      .reduce((longest, current) => current.length > longest.length ? current : longest, '');
-
-    // Hacemos la petición a la API de videos de Pexels
-    fetch(`https://api.pexels.com/videos/search?query=${longestWord}&per_page=1&page=1`, {
-      headers: {
-        Authorization: 'ddjm8OIXvFDtgsNCCPWeH38zaZdgMymJGqe9rjrXfYfGKrKboUSiok62'
-      }
-    })
+    const randomQuote = data[Math.floor(Math.random() * data.length)];
+    // Obtener la palabra más larga de la cita
+    const longestWord = randomQuote.text
+      .replace(/[^\w\s]|_/g, "") // Eliminar signos de puntuación
+      .split(" ")
+      .reduce((acc, cur) => acc.length >= cur.length ? acc : cur, "");
+    // Obtener un video relacionado con la palabra más larga
+    const videoUrl = `https://api.pexels.com/videos/search?query=${longestWord}&per_page=1`;
+    const headers = new Headers({
+      "Authorization": "Bearer ddjm8OIXvFDtgsNCCPWeH38zaZdgMymJGqe9rjrXfYfGKrKboUSiok62"
+    });
+    fetch(videoUrl, { headers })
       .then(response => response.json())
       .then(data => {
-        // Obtenemos un video aleatorio
-        const videoUrl = data.videos[Math.floor(Math.random() * data.videos.length)].video_files[0].link;
-
-        // Establecemos la fuente del video
-        video.src = videoUrl;
-
-        // Añadimos el evento de carga del video para mostrar el spinner
-        video.addEventListener('loadstart', () => {
-          text.innerText = 'Loading...';
+        const video = document.createElement("video");
+        video.src = data.videos[0].video_files[0].link;
+        video.loop = true;
+        video.autoplay = true;
+        video.muted = true;
+        video.style.position = "fixed";
+        video.style.top = "0";
+        video.style.left = "0";
+        video.style.width = "100%";
+        video.style.height = "100%";
+        video.style.objectFit = "cover";
+        const spinner = document.createElement("div");
+        spinner.className = "spinner";
+        spinner.style.position = "absolute";
+        spinner.style.top = "50%";
+        spinner.style.left = "50%";
+        spinner.style.transform = "translate(-50%, -50%)";
+        spinner.innerHTML = `
+          <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        `;
+        document.body.appendChild(spinner);
+        video.addEventListener("loadeddata", () => {
+          spinner.remove();
+          document.body.appendChild(video);
         });
-
-        // Añadimos el evento de carga completa del video para mostrar la cita
-        video.addEventListener('canplay', () => {
-          text.innerText = `"${quote.text}" - ${quote.author}`;
-        });
-
-        // Iniciamos la carga del video
-        video.load();
       })
-      .catch(error => console.log(error));
+      .catch(() => {
+        // Si no se encuentra un video relacionado con la palabra más larga, intentar con otra palabra
+        setTimeout(() => {
+          location.reload();
+        }, 2000);
+      });
+    // Mostrar la cita
+    const quoteContainer = document.createElement("div");
+    quoteContainer.style.position = "fixed";
+    quoteContainer.style.top = "50%";
+    quoteContainer.style.left = "50%";
+    quoteContainer.style.transform = "translate(-50%, -50%)";
+    quoteContainer.style.textAlign = "center";
+    quoteContainer.style.zIndex = "1";
+    quoteContainer.style.color = "#fff";
+    quoteContainer.style.textShadow = "2px 2px #333";
+    quoteContainer.innerHTML = `
+      <p style="font-size: 3rem; font-weight: bold; line-height: 1.2;">${randomQuote.text}</p>
+      <p style="font-size: 2rem; font-style: italic; margin-top: 1rem;">- ${randomQuote.author}</p>
+    `;
+    document.body.appendChild(quoteContainer);
   })
-  .catch(error => console.log(error));
+  .catch(error => console.error(error));
