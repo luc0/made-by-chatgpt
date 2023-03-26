@@ -1,68 +1,53 @@
-// URL de la API de Pexels
-const API_URL = 'https://api.pexels.com/videos/search?query=';
-// API key de Pexels
-const API_KEY = 'ddjm8OIXvFDtgsNCCPWeH38zaZdgMymJGqe9rjrXfYfGKrKboUSiok62';
-// Palabras clave para la búsqueda de videos en Pexels
-const PALABRAS_CLAVE = ['naturaleza', 'ciudad', 'viajes', 'arte'];
+const API_KEY = "ddjm8OIXvFDtgsNCCPWeH38zaZdgMymJGqe9rjrXfYfGKrKboUSiok62";
+const videoContainer = document.createElement("div");
+const textContainer = document.createElement("div");
+const spinner = document.createElement("div");
+spinner.className = "spinner";
 
-// Frases con autores correspondientes
-const FRASES = [
-  {
-    frase: 'La vida es un viaje, disfrútalo.',
-    autor: 'Socrates'
-  },
-  {
-    frase: 'La creatividad es la inteligencia divirtiéndose.',
-    autor: 'Albert Einstein'
-  },
-  {
-    frase: 'No te rindas, el principio siempre es el más difícil.',
-    autor: 'Proverbio japonés'
-  },
-  {
-    frase: 'No hay nada más poderoso que una idea cuyo momento ha llegado.',
-    autor: 'Victor Hugo'
+const getVideoUrl = async () => {
+  try {
+    const response = await fetch(
+      `https://api.pexels.com/videos/search?query=nature&per_page=80`,
+      { headers: { Authorization: API_KEY } }
+    );
+    const { videos } = await response.json();
+    const video = videos[Math.floor(Math.random() * videos.length)];
+    return video.video_files.find((file) => file.quality === "hd").link;
+  } catch (err) {
+    console.error(err);
   }
-];
+};
 
-// Seleccionar una palabra clave al azar
-const palabraClave = PALABRAS_CLAVE[Math.floor(Math.random() * PALABRAS_CLAVE.length)];
-
-// Obtener un video al azar de Pexels con la palabra clave seleccionada
-fetch(API_URL + palabraClave, {
-  headers: {
-    Authorization: API_KEY
+const getQuote = async () => {
+  try {
+    const response = await fetch(
+      "https://type.fit/api/quotes"
+    );
+    const quotes = await response.json();
+    const quote = quotes[Math.floor(Math.random() * quotes.length)];
+    return quote;
+  } catch (err) {
+    console.error(err);
   }
-})
-  .then(response => response.json())
-  .then(data => {
-    // Seleccionar un video al azar
-    const video = data.videos[Math.floor(Math.random() * data.videos.length)];
-    // Crear la etiqueta de video y establecer sus propiedades
-    const videoTag = document.createElement('video');
-    videoTag.src = video.video_files[0].link;
-    videoTag.autoplay = true;
-    videoTag.loop = true;
-    videoTag.muted = true;
-    videoTag.style.position = 'fixed';
-    videoTag.style.top = '50%';
-    videoTag.style.left = '50%';
-    videoTag.style.minWidth = '100%';
-    videoTag.style.minHeight = '100%';
-    videoTag.style.width = 'auto';
-    videoTag.style.height = 'auto';
-    videoTag.style.objectFit = 'cover';
-    videoTag.style.transform = 'translate(-50%, -50%)';
-    // Agregar la etiqueta de video al cuerpo del documento
-    document.body.appendChild(videoTag);
-  })
-  .catch(error => console.log(error));
+};
 
-// Seleccionar una frase al azar
-const frase = FRASES[Math.floor(Math.random() * FRASES.length)];
+const setVideoBackground = async () => {
+  spinner.style.display = "block";
+  const videoUrl = await getVideoUrl();
+  videoContainer.innerHTML = `<video autoplay loop muted playsinline style="object-fit: cover; position: fixed; top: 0; left: 0; height: 100%; width: 100%; z-index: -1;">
+  <source src="${videoUrl}" type="video/mp4">
+  Your browser does not support the video tag.
+</video>`;
+  const quote = await getQuote();
+  textContainer.innerHTML = `<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-align: center; font-size: 5vw; font-weight: bold; line-height: 1.5; text-shadow: 2px 2px black;">
+  ${quote.text}
+  <br><br>
+  <span style="font-size: 3vw; font-weight: normal;">${quote.author}</span>
+</div>`;
+  spinner.style.display = "none";
+};
 
-// Crear la etiqueta de frase y establecer sus propiedades
-const fraseTag = document.createElement('div');
-fraseTag.innerHTML = `<h1 style="z-index:999;position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 5rem; text-align: center; color: white;">"${frase.frase}"<br>- ${frase.autor} -</h1>`;
-// Agregar la etiqueta de frase al cuerpo del documento
-document.body.appendChild(fraseTag);
+setVideoBackground();
+document.body.appendChild(videoContainer);
+document.body.appendChild(textContainer);
+document.body.appendChild(spinner);
